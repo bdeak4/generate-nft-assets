@@ -41,6 +41,7 @@ const config = {
     width: 1000,
     height: 1000,
   },
+  assetsDir: "./assets",
   indexOffset: 0,
   traits,
 };
