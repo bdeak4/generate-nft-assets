@@ -6,10 +6,12 @@
   "author": "Bartol Deak <b@bdeak.net>",
   "license": "MIT",
   "scripts": {
-    "generate:assets": "ts-node generate-assets.ts",
-    "generate:config": "ts-node generate-config.ts"
+    "assets:generate": "ts-node assets-generate.ts",
+    "config:generate": "ts-node config-generate.ts",
+    "config:validate": "ts-node config-validate.ts"
   },
-  "dependencies": {
+  "devDependencies": {
+    "@types/node": "^18.15.3",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   }
