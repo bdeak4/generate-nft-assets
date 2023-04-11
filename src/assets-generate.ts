@@ -1,10 +1,11 @@
 import * as fs from "fs";
+import * as asyncfs from "fs/promises";
 import path from "path";
 import _ from "lodash";
 import pLimit from "p-limit";
 import sharp from "sharp";
 
-import { Config } from "./types";
+import { Config, WeightableItem } from "./types";
 
 const config: Config = JSON.parse(fs.readFileSync("config.json", "utf8"));
 const traitsCache = "trait-cache";
@@ -17,16 +18,19 @@ const mkdir = (...dirs: string[]) => {
   }
 };
 
-const getTraitImage = (trait: string, value: string) =>
+const getTraitImagePath = (trait: string, value: string) =>
   path.join(traitsCache, trait, `${value}.png`);
 
-const resizeTraitImages = async (): Promise<sharp.OutputInfo[]> => {
+const weightedPick = <T extends WeightableItem>(items: T[]): T =>
+  _.sample(items.flatMap((item) => _.times(item.weight, () => item)))!;
+
+const resizeTraitImages = async (): Promise<unknown[]> => {
   console.log("Optimizing trait images...");
 
   mkdir(traitsCache);
 
   const concurrent = pLimit(10);
-  const promises: Promise<sharp.OutputInfo>[] = [];
+  const promises: Promise<unknown>[] = [];
 
   for (const trait of config.traits) {
     mkdir(path.join(traitsCache, trait.name));
@@ -36,7 +40,7 @@ const resizeTraitImages = async (): Promise<sharp.OutputInfo[]> => {
         concurrent(() =>
           sharp(value.path)
             .resize(config.imageSize.width, config.imageSize.height)
-            .toFile(getTraitImage(trait.name, value.name))
+            .toFile(getTraitImagePath(trait.name, value.name))
             .finally(() => console.log(`optimized ${trait.name}/${value.name}`))
         )
       );
@@ -46,25 +50,62 @@ const resizeTraitImages = async (): Promise<sharp.OutputInfo[]> => {
   return Promise.all(promises);
 };
 
-const generateAssets = async (): Promise<sharp.OutputInfo[]> => {
+const generateAssets = async (): Promise<unknown[]> => {
   console.log("Generating assets...");
 
   mkdir(config.assetsDir);
 
   const concurrent = pLimit(10);
-  const promises: Promise<sharp.OutputInfo>[] = [];
+  const promises: Promise<unknown>[] = [];
 
   for (let i = 0; i < config.count; i++) {
-    const layers = config.traits.map((trait) =>
-      getTraitImage(trait.name, _.sample(trait.values)!.name)
+    const n = config.offset + i;
+
+    const traits = config.traits.map((trait) => ({
+      name: trait.name,
+      value: weightedPick(trait.values),
+    }));
+
+    const metadata = {
+      name: config.nftNameTemplate.replace("$NUMBER", `${n}`),
+      symbol: config.symbol,
+      description: config.nftDescriptionTemplate.replace("$NUMBER", `${n}`),
+      image: `${n}.png`,
+      attributes: traits.map((trait) => ({
+        trait_type: trait.name,
+        value: trait.value.name,
+      })),
+      properties: {
+        files: [
+          {
+            uri: `${n}.png`,
+            type: "image/png",
+          },
+        ],
+      },
+    };
+
+    const layers = traits.map((trait) =>
+      getTraitImagePath(trait.name, trait.value.name)
+    );
+
+    promises.push(
+      concurrent(() =>
+        asyncfs
+          .writeFile(
+            path.join(config.assetsDir, `${n}.json`),
+            JSON.stringify(metadata, null, 2)
+          )
+          .finally(() => console.log(`generated ${n}.json`))
+      )
     );
 
     promises.push(
       concurrent(() =>
         sharp(layers.shift())
           .composite(layers.map((layer) => ({ input: layer })))
-          .toFile(path.join(config.assetsDir, `${config.offset + i}.png`))
-          .finally(() => console.log(`generated ${config.offset + i}.png`))
+          .toFile(path.join(config.assetsDir, `${n}.png`))
+          .finally(() => console.log(`generated ${n}.png`))
       )
     );
   }

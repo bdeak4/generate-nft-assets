@@ -26,7 +26,6 @@ const traits = fs
       name: cleanFilename(trait),
       path: path.join(traitsDir, name, trait),
       weight: 1,
-      count: null,
     })),
   }));
 

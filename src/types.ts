@@ -23,3 +23,7 @@ export interface Config {
     }[];
   }[];
 }
+
+export interface WeightableItem {
+  weight: number;
+}
