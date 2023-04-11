@@ -22,3 +22,20 @@ export interface Config {
     }[];
   }[];
 }
+
+export interface Metadata {
+  name: string;
+  symbol: string;
+  description: string;
+  image: string;
+  attributes: {
+    trait_type: string;
+    value: string;
+  }[];
+  properties: {
+    files: {
+      uri: string;
+      type: string;
+    }[];
+  };
+}
