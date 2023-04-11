@@ -19,11 +19,6 @@ export interface Config {
       name: string;
       path: string;
       weight: number;
-      count?: null;
     }[];
   }[];
-}
-
-export interface WeightableItem {
-  weight: number;
 }

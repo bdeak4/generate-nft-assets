@@ -5,24 +5,14 @@ import _ from "lodash";
 import pLimit from "p-limit";
 import sharp from "sharp";
 
-import { Config, WeightableItem } from "./types";
+import { mkdir, weightedPick } from "./utils";
+import { Config } from "./types";
 
 const config: Config = JSON.parse(fs.readFileSync("config.json", "utf8"));
 const traitsCache = "trait-cache";
 
-const mkdir = (...dirs: string[]) => {
-  for (const dir of dirs) {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-  }
-};
-
 const getTraitImagePath = (trait: string, value: string) =>
   path.join(traitsCache, trait, `${value}.png`);
-
-const weightedPick = <T extends WeightableItem>(items: T[]): T =>
-  _.sample(items.flatMap((item) => _.times(item.weight, () => item)))!;
 
 const resizeTraitImages = async (): Promise<unknown[]> => {
   console.log("Optimizing trait images...");
