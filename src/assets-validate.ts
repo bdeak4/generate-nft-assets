@@ -5,7 +5,8 @@ import _ from "lodash";
 
 import { Config, Metadata } from "./types";
 
-const config: Config = JSON.parse(fs.readFileSync("config.json", "utf8"));
+const configPath = process.argv[2] || "config.json";
+const config: Config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 const loadAllMetadata = async (): Promise<Metadata[]> => {
   const assetsDir = await asyncfs.readdir(config.assetsDir);

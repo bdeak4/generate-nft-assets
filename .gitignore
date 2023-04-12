@@ -1,5 +1,5 @@
 node_modules
 
-assets
-config.json
+assets*
+config*.json
 trait-cache

@@ -12,8 +12,8 @@ if (fs.existsSync("config.json")) {
 }
 
 const cleanFilename = (name: string) => {
-  const capitalize = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
-  return capitalize.replace(".png", "").replace("_", " ");
+  // TODO: title case
+  return name.replace(".png", "");
 };
 
 const traits = fs

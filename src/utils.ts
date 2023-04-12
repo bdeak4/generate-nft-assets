@@ -10,4 +10,6 @@ export const mkdir = (...dirs: string[]) => {
 };
 
 export const weightedPick = <T extends { weight: number }>(items: T[]): T =>
-  _.sample(items.flatMap((item) => _.times(item.weight, () => item)))!;
+  _.sample(
+    items.flatMap((item) => _.times(Math.round(item.weight * 100), () => item))
+  )!;
