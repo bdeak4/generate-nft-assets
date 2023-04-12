@@ -8,7 +8,8 @@ import sharp from "sharp";
 import { mkdir, weightedPick } from "./utils";
 import { Config } from "./types";
 
-const config: Config = JSON.parse(fs.readFileSync("config.json", "utf8"));
+const configPath = process.argv[2] || "config.json";
+const config: Config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 const traitsCache = "trait-cache";
 
 const getTraitImagePath = (trait: string, value: string) =>
@@ -26,6 +27,8 @@ const resizeTraitImages = async (): Promise<unknown[]> => {
     mkdir(path.join(traitsCache, trait.name));
 
     for (const value of trait.values) {
+      if (!value.path) continue;
+
       promises.push(
         concurrent(() =>
           sharp(value.path)
@@ -66,6 +69,7 @@ const generateAssets = async (): Promise<unknown[]> => {
         value: trait.value.name,
       })),
       properties: {
+        category: "image",
         files: [
           {
             uri: `${n}.png`,
@@ -75,9 +79,9 @@ const generateAssets = async (): Promise<unknown[]> => {
       },
     };
 
-    const layers = traits.map((trait) =>
-      getTraitImagePath(trait.name, trait.value.name)
-    );
+    const layers = traits
+      .filter((trait) => !!trait.value.path)
+      .map((trait) => getTraitImagePath(trait.name, trait.value.name));
 
     promises.push(
       concurrent(() =>
