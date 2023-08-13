@@ -11,7 +11,8 @@ export interface Config {
   };
   assetsDir: string;
   count: number;
-  offset: number;
+  fileNameOffset: number;
+  nftNameOffset: number;
   traits: {
     name: string;
     path: string;

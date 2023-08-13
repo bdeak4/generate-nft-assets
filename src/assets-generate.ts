@@ -52,7 +52,8 @@ const generateAssets = async (): Promise<unknown[]> => {
   const promises: Promise<unknown>[] = [];
 
   for (let i = 0; i < config.count; i++) {
-    const n = config.offset + i;
+    const nft = config.nftNameOffset + i;
+    const file = config.fileNameOffset + i;
 
     const traits = config.traits.map((trait) => ({
       name: trait.name,
@@ -60,10 +61,10 @@ const generateAssets = async (): Promise<unknown[]> => {
     }));
 
     const metadata = {
-      name: config.nftNameTemplate.replace("$NUMBER", `${n}`),
+      name: config.nftNameTemplate.replace("$NUMBER", `${nft}`),
       symbol: config.symbol,
-      description: config.nftDescriptionTemplate.replace("$NUMBER", `${n}`),
-      image: `${n}.png`,
+      description: config.nftDescriptionTemplate.replace("$NUMBER", `${nft}`),
+      image: `${file}.png`,
       attributes: traits.map((trait) => ({
         trait_type: trait.name,
         value: trait.value.name,
@@ -72,7 +73,7 @@ const generateAssets = async (): Promise<unknown[]> => {
         category: "image",
         files: [
           {
-            uri: `${n}.png`,
+            uri: `${file}.png`,
             type: "image/png",
           },
         ],
@@ -87,10 +88,10 @@ const generateAssets = async (): Promise<unknown[]> => {
       concurrent(() =>
         asyncfs
           .writeFile(
-            path.join(config.assetsDir, `${n}.json`),
+            path.join(config.assetsDir, `${file}.json`),
             JSON.stringify(metadata, null, 2)
           )
-          .finally(() => console.log(`generated ${n}.json`))
+          .finally(() => console.log(`generated ${file}.json`))
       )
     );
 
@@ -98,8 +99,8 @@ const generateAssets = async (): Promise<unknown[]> => {
       concurrent(() =>
         sharp(layers.shift())
           .composite(layers.map((layer) => ({ input: layer })))
-          .toFile(path.join(config.assetsDir, `${n}.png`))
-          .finally(() => console.log(`generated ${n}.png`))
+          .toFile(path.join(config.assetsDir, `${file}.png`))
+          .finally(() => console.log(`generated ${file}.png`))
       )
     );
   }
