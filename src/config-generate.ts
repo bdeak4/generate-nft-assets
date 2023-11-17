@@ -31,9 +31,6 @@ const traits = fs
 
 const config = {
   symbol: "MYNFT",
-  collectionName: "My NFT Collection",
-  collectionImagePath: "./mynfts.png",
-  collectionDescription: "",
   nftNameTemplate: "My NFT $NUMBER",
   nftDescriptionTemplate: "",
   imageSize: {

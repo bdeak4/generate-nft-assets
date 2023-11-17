@@ -6,10 +6,9 @@
   "author": "Bartol Deak <b@bdeak.net>",
   "license": "MIT",
   "scripts": {
-    "assets:generate": "ts-node src/assets-generate.ts",
-    "assets:validate": "ts-node src/assets-validate.ts",
     "config:generate": "ts-node src/config-generate.ts",
-    "config:validate": "ts-node src/config-validate.ts"
+    "assets:generate": "ts-node src/assets-generate.ts",
+    "assets:validate": "ts-node src/assets-validate.ts"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.191",
