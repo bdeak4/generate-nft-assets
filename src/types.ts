@@ -1,8 +1,5 @@
 export interface Config {
   symbol: string;
-  collectionName: string;
-  collectionImagePath: string;
-  collectionDescription: string;
   nftNameTemplate: string;
   nftDescriptionTemplate: string;
   imageSize: {
